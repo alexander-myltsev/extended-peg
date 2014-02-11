@@ -27,8 +27,8 @@ object SampleParser extends App {
     print("---\nEnter expression for sample-parser > ")
     Console.out.flush()
     readLine() match {
-      case "" =>
-      case line =>
+      case "" ⇒
+      case line ⇒
         val parser = new SampleParser(line)
         println(s"Expression matched is '${parser.InputRule.matched}'")
         repl()

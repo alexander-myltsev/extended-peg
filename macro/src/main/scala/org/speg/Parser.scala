@@ -45,13 +45,13 @@ abstract class Parser {
 }
 
 object Parser {
-  type ParserContext = Context {type PrefixType = Parser}
+  type ParserContext = Context { type PrefixType = Parser }
 
   def ruleImpl(ctx: ParserContext)(r: ctx.Expr[Rule]): ctx.Expr[Rule] = {
     import ctx.universe._
 
     def render(tree: Tree): Tree = tree match {
-      case q"$a.this.str($s)" => q"""
+      case q"$a.this.str($s)" ⇒ q"""
           var ix = 0
           while (ix < $s.length && $s.charAt(ix) == p.cursorChar()) {
             ix += 1
@@ -59,13 +59,13 @@ object Parser {
           }
           Rule(ix == $s.length)
         """
-      case q"$a.this.ch($ch)" => q"""
+      case q"$a.this.ch($ch)" ⇒ q"""
           if ($ch == p.cursorChar()) {
             p.advance()
             Rule.MATCH
           } else Rule.MISMATCH
         """
-      case q"$lhs.|($rhs)" => q"""
+      case q"$lhs.|($rhs)" ⇒ q"""
           val mark = p._cursor
           if (${render(lhs)}.matched) {
             Rule.MATCH
@@ -74,11 +74,11 @@ object Parser {
             ${render(rhs)}
           }
         """
-      case q"$lhs.~($rhs)" => q"""
+      case q"$lhs.~($rhs)" ⇒ q"""
           Rule(${render(lhs)}.matched && ${render(rhs)}.matched)
         """
-      case call @ (Apply(_, _) | Select(_, _) | Ident(_)) => call
-      case x => ctx.abort(tree.pos, s"Unexpected expression: $tree")
+      case call @ (Apply(_, _) | Select(_, _) | Ident(_)) ⇒ call
+      case x ⇒ ctx.abort(tree.pos, s"Unexpected expression: $tree")
     }
 
     ctx.Expr[Rule](q"""

@@ -1,3 +1,5 @@
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
 import sbt._
 import Keys._
 
@@ -31,14 +33,24 @@ val scalaReflect = "org.scala-lang"  %  "scala-reflect"    % "2.10.3"   % "compi
 val shapeless    = "com.chuusai"     %  "shapeless_2.10.3" % "2.0.0-M1" % "compile"
 val specs2       = "org.specs2"      %% "specs2-core"      % "2.3.6"    % "test"
 
+val formattingSettings = scalariformSettings ++ Seq(
+  ScalariformKeys.preferences := ScalariformKeys.preferences.value
+    .setPreference(RewriteArrowSymbols, true)
+    .setPreference(AlignParameters, true)
+    .setPreference(AlignSingleLineCaseStatements, true)
+    .setPreference(DoubleIndentClassDeclaration, true)
+    .setPreference(PreserveDanglingCloseParenthesis, true))
+
 lazy val main = Project("main", file("."))
   .dependsOn(macroSub)
   .settings(commonSettings: _*)
+  .settings(formattingSettings: _*)
   .settings(
     libraryDependencies ++= Seq(scalaReflect, shapeless, specs2))
 
 lazy val macroSub = Project("macro", file("macro"))
   .settings(commonSettings: _*)
+  .settings(formattingSettings: _*)
   .settings(
     addCompilerPlugin("org.scala-lang.plugins" % "macro-paradise" % "2.0.0-SNAPSHOT" cross CrossVersion.full),
     libraryDependencies ++= Seq(scalaReflect, shapeless, specs2))
