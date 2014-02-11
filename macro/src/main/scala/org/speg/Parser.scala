@@ -41,6 +41,21 @@ abstract class Parser {
       true
     } else false
 
+  def stringMatch(s: String) = {
+    var ix = 0
+    while (ix < s.length && s.charAt(ix) == cursorChar()) {
+      ix += 1
+      advance()
+    }
+    ix == s.length
+  }
+
+  def charMatch(ch: Char) =
+    if (ch == cursorChar()) {
+      advance()
+      true
+    } else false
+
   def rule(r: Rule): Rule = macro ruleImpl
 }
 
@@ -51,20 +66,8 @@ object Parser {
     import ctx.universe._
 
     def render(tree: Tree): Tree = tree match {
-      case q"$a.this.str($s)" ⇒ q"""
-          var ix = 0
-          while (ix < $s.length && $s.charAt(ix) == p.cursorChar()) {
-            ix += 1
-            p.advance()
-          }
-          Rule(ix == $s.length)
-        """
-      case q"$a.this.ch($ch)" ⇒ q"""
-          if ($ch == p.cursorChar()) {
-            p.advance()
-            Rule.MATCH
-          } else Rule.MISMATCH
-        """
+      case q"$a.this.str($s)" ⇒ q"""Rule(p.stringMatch($s))"""
+      case q"$a.this.ch($ch)" ⇒ q"""Rule(p.charMatch($ch))"""
       case q"$lhs.|($rhs)" ⇒ q"""
           val mark = p._cursor
           if (${render(lhs)}.matched) {
