@@ -37,5 +37,6 @@ object SampleParser extends App {
 }
 
 class SampleParser(val input: ParserInput) extends Parser {
-  def InputRule = rule { "abc" }
+  def bc = rule { "b" | "c" }
+  def InputRule = rule { "a" ~ bc ~ EOI }
 }

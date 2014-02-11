@@ -19,9 +19,9 @@ package org.speg
 import support._
 
 class Rule(val matched: Boolean) extends AnyVal {
-  def |(r: Rule) = `n/a`
+  def |(r: Rule): Rule = `n/a`
 
-  def ~(r: Rule) = `n/a`
+  def ~(r: Rule): Rule = `n/a`
 }
 
 object Rule {
