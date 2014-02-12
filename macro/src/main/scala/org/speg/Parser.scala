@@ -81,6 +81,29 @@ object Parser {
         """
       case call @ (Apply(_, _) | Select(_, _) | Ident(_)) ⇒ {
         println(s" >> Inner rule call:\n  $call\n  > Structure: ${call.tpe}")
+        def prettyPrint(tp: Type, indent: Int = 0): Unit = {
+          val is = " " * indent
+          tp match {
+            case x if x <:< typeOf[StringMatch] ⇒
+              println(s"$is* StringMatch")
+            case x @ TypeRef(_, _, List(lhs, rhs)) if x <:< typeOf[FirstOfMatch[_, _]] ⇒
+              println(s"$is* FirstOfMatch")
+              prettyPrint(lhs, indent + 1)
+              prettyPrint(rhs, indent + 1)
+            case x @ TypeRef(_, _, List(lhs, rhs)) if x <:< typeOf[SeqMatch[_, _]] ⇒
+              println(s"$is* SeqMatch")
+              prettyPrint(lhs, indent + 1)
+              prettyPrint(rhs, indent + 1)
+            case x @ TypeRef(_, _, List(t)) if x <:< typeOf[Rule[_]] ⇒
+              println(s"$is* Rule[$t]")
+              prettyPrint(t, indent + 1)
+            case x if x <:< typeOf[Node] ⇒
+              println(s"$is* Node")
+            case _ ⇒
+              ctx.abort(call.pos, s"Unknown type structure: $tp")
+          }
+        }
+        prettyPrint(call.tpe)
         call
       }
       case x ⇒ ctx.abort(tree.pos, s"Unexpected expression: $tree")

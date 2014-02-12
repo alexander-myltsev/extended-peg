@@ -18,7 +18,7 @@ package org.speg
 
 import support._
 
-class Rule[T <: Node](val matched: Boolean) {
+class Rule[+T <: Node](val matched: Boolean) {
   def |[U <: Node](r: Rule[U]): Rule[FirstOfMatch[T, U]] = `n/a`
 
   def ~[U <: Node](r: Rule[U]): Rule[SeqMatch[T, U]] = `n/a`
