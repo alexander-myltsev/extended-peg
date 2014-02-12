@@ -18,16 +18,16 @@ package org.speg
 
 import support._
 
-class Rule(val matched: Boolean) extends AnyVal {
-  def |(r: Rule): Rule = `n/a`
+class Rule[T <: Node](val matched: Boolean) {
+  def |[U <: Node](r: Rule[U]): Rule[FirstOfMatch[T, U]] = `n/a`
 
-  def ~(r: Rule): Rule = `n/a`
+  def ~[U <: Node](r: Rule[U]): Rule[SeqMatch[T, U]] = `n/a`
 }
 
 object Rule {
-  def apply(matched: Boolean) = new Rule(matched)
+  def apply[T <: Node](matched: Boolean) = new Rule[T](matched)
 
-  val MATCH = Rule(true)
+  def MATCH[T <: Node] = Rule[T](true)
 
-  val MISMATCH = Rule(false)
+  def MISMATCH[T <: Node] = Rule[T](false)
 }
