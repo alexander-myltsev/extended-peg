@@ -57,6 +57,8 @@ abstract class Parser {
     } else false
 
   def rule[I <: Node](r: Rule[I]): Rule[I] = macro ruleImpl[I]
+
+  def ^[A](a: A) = macro LiteralSingleton.applyImpl[A]
 }
 
 object Parser {
@@ -79,6 +81,13 @@ object Parser {
       case q"$lhs.~[$t]($rhs)" ⇒ q"""
           Rule(${render(lhs)}.matched && ${render(rhs)}.matched)
         """
+      case q"org.speg.Rule.apply[$t]($ls)" ⇒ {
+        val tpRE = """org.speg.LiteralSingleton\[String\("(\w+)"\)\]""".r
+        val tpRE(tp) = t.toString
+        q"""
+          Rule(p.stringMatch($tp))
+        """
+      }
       case call @ (Apply(_, _) | Select(_, _) | Ident(_)) ⇒ {
         println(s" >> Inner rule call:\n  $call\n  > Structure: ${call.tpe}")
         def prettyPrint(tp: Type, indent: Int = 0): Unit = {
@@ -109,9 +118,12 @@ object Parser {
       case x ⇒ ctx.abort(tree.pos, s"Unexpected expression: $tree")
     }
 
-    ctx.Expr[Rule[I]](q"""
+    val res = ctx.Expr[Rule[I]](q"""
       val p = ${ctx.prefix}
       ${render(r.tree)}
     """)
+    val s = "-" * 10 + "\n"
+    println(s"$s$s${res.toString.replaceAll("org.speg.", "")}\n$s")
+    res
   }
 }

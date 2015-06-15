@@ -25,7 +25,9 @@ class Rule[+T <: Node](val matched: Boolean) {
 }
 
 object Rule {
-  def apply[T <: Node](matched: Boolean) = new Rule[T](matched)
+  def apply[T <: Node](matched: Boolean): Rule[T] = new Rule[T](matched)
+
+  def apply[T <: Node](fakeVal: T): Rule[T] = apply[T](false)
 
   def MATCH[T <: Node] = Rule[T](true)
 
